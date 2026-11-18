@@ -1,0 +1,32 @@
+{
+  "simulation": true,
+  "invoices": [
+    {
+      "id": "INV-1001",
+      "vendor": "Example Supplies",
+      "total_amount": 75000,
+      "currency": "INR",
+      "status": "submitted"
+    },
+    {
+      "id": "INV-1002",
+      "vendor": "Sample Tools",
+      "total_amount": 25000,
+      "currency": "INR",
+      "status": "submitted"
+    }
+  ],
+  "personas": [
+    {
+      "id": "demo-reviewer",
+      "role": "reviewer"
+    },
+    {
+      "id": "demo-viewer",
+      "role": "viewer"
+    }
+  ],
+  "manager_decisions": {
+    "INV-1001": "approved"
+  }
+}

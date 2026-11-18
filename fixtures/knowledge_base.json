@@ -1,0 +1,34 @@
+{
+  "documents": [
+    {
+      "id": "doc-approval-v1",
+      "version": "1.0",
+      "title": "Manager approval action",
+      "content": "For requests requiring manager approval use manager_approval. Approval needs explicit reviewer decision; never auto approve."
+    },
+    {
+      "id": "doc-threshold-v1",
+      "version": "1.0",
+      "title": "Amount thresholds",
+      "content": "Use compare_number with field total_amount, operator greater_than and numeric threshold. Include both outcomes."
+    },
+    {
+      "id": "doc-notify-v1",
+      "version": "1.0",
+      "title": "Notification simulator",
+      "content": "send_notification writes to local outbox. It does not send live M365 mail or Teams messages."
+    },
+    {
+      "id": "doc-sharepoint-v1",
+      "version": "1.0",
+      "title": "Mock list item operations",
+      "content": "Use create_list_item, lookup_list_item or update_list_item for local SharePoint-like records only."
+    },
+    {
+      "id": "doc-security-v1",
+      "version": "1.0",
+      "title": "Agent safety rules",
+      "content": "Only allowlisted tools, no real tenant connections, no implicit approvals, audit all steps."
+    }
+  ]
+}

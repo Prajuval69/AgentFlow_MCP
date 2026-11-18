@@ -1,0 +1,133 @@
+{
+  "id": "sample-invoice-approval",
+  "title": "Invoice Approval",
+  "intent": "If invoice amount exceeds INR 50000, request manager approval and notify finance",
+  "version": 1,
+  "schema_version": "1.0",
+  "steps": [
+    {
+      "id": "start",
+      "action_type": "manual_trigger",
+      "inputs": {},
+      "next_on_success": "work",
+      "next_on_failure": null,
+      "approval_required": false
+    },
+    {
+      "id": "work",
+      "action_type": "compare_number",
+      "inputs": {
+        "predicate": {
+          "operator": "greater_than",
+          "field": "total_amount",
+          "value": 50000.0
+        }
+      },
+      "next_on_success": "approve",
+      "next_on_failure": "unchanged",
+      "approval_required": false
+    },
+    {
+      "id": "approve",
+      "action_type": "manager_approval",
+      "inputs": {},
+      "next_on_success": "notify",
+      "next_on_failure": "rejected",
+      "approval_required": true
+    },
+    {
+      "id": "notify",
+      "action_type": "send_notification",
+      "inputs": {
+        "recipient": "finance",
+        "text": "Invoice approved (simulation)"
+      },
+      "next_on_success": "done",
+      "next_on_failure": null,
+      "approval_required": false
+    },
+    {
+      "id": "rejected",
+      "action_type": "terminate",
+      "inputs": {
+        "outcome": "rejected_simulated"
+      },
+      "next_on_success": null,
+      "next_on_failure": null,
+      "approval_required": false
+    },
+    {
+      "id": "unchanged",
+      "action_type": "terminate",
+      "inputs": {
+        "outcome": "below_threshold_simulated"
+      },
+      "next_on_success": null,
+      "next_on_failure": null,
+      "approval_required": false
+    },
+    {
+      "id": "done",
+      "action_type": "terminate",
+      "inputs": {
+        "outcome": "finance_notified_simulated"
+      },
+      "next_on_success": null,
+      "next_on_failure": null,
+      "approval_required": false
+    }
+  ],
+  "evidence": [
+    {
+      "source_id": "doc-threshold-v1",
+      "version": "1.0",
+      "title": "Amount thresholds",
+      "passage": "Use compare_number with field total_amount, operator greater_than and numeric threshold. Include both outcomes.",
+      "score": 0.33381358091616453,
+      "content_sha256": "3dd56a5f061bd6a9e686bfbb8dc5b3a59366e7930b71d7d78f81a62e6adbfaef",
+      "trusted_as_instructions": false
+    },
+    {
+      "source_id": "doc-approval-v1",
+      "version": "1.0",
+      "title": "Manager approval action",
+      "passage": "For requests requiring manager approval use manager_approval. Approval needs explicit reviewer decision; never auto approve.",
+      "score": 0.31008028503817775,
+      "content_sha256": "24f95e75a15fbfe9258725a11abc0bca8763df4c9a4cb44a8e78d83b9909de8e",
+      "trusted_as_instructions": false
+    },
+    {
+      "source_id": "doc-notify-v1",
+      "version": "1.0",
+      "title": "Notification simulator",
+      "passage": "send_notification writes to local outbox. It does not send live M365 mail or Teams messages.",
+      "score": 0.20915944760475724,
+      "content_sha256": "85049161a7038942da808b9042dfba2f4b2b9fc6308044095f7f903d70d2adc6",
+      "trusted_as_instructions": false
+    },
+    {
+      "source_id": "doc-security-v1",
+      "version": "1.0",
+      "title": "Agent safety rules",
+      "passage": "Only allowlisted tools, no real tenant connections, no implicit approvals, audit all steps.",
+      "score": 0.0,
+      "content_sha256": "38c4773f6e6695c74be2a66d1b94ffb65f60c5b8710f3687781cac10484310ae",
+      "trusted_as_instructions": false
+    },
+    {
+      "source_id": "doc-sharepoint-v1",
+      "version": "1.0",
+      "title": "Mock list item operations",
+      "passage": "Use create_list_item, lookup_list_item or update_list_item for local SharePoint-like records only.",
+      "score": 0.0,
+      "content_sha256": "bdf15b827bdbd3cf628a3f9f80b2d5cf06bd3a253ac872fc8a3e7dca00db5109",
+      "trusted_as_instructions": false
+    }
+  ],
+  "warnings": [
+    "Threshold and explicit manager decision are supported locally."
+  ],
+  "requires_manual_review": false,
+  "simulation_mode": true,
+  "provider": "mock"
+}

@@ -1,0 +1,72 @@
+{
+  "version": "1.1.0",
+  "mode": "simulated",
+  "actions": [
+    {
+      "type": "manual_trigger",
+      "description": "Start with fixture data",
+      "requires_approval": false,
+      "side_effect": "none"
+    },
+    {
+      "type": "compare_number",
+      "description": "Compare numeric field to threshold",
+      "requires_approval": false,
+      "side_effect": "none"
+    },
+    {
+      "type": "manager_approval",
+      "description": "Simulate manager decision; explicit approve/reject fixture required",
+      "requires_approval": true,
+      "side_effect": "simulated"
+    },
+    {
+      "type": "send_notification",
+      "description": "Add a message to local outbox, never sends real email",
+      "requires_approval": false,
+      "side_effect": "local_outbox"
+    },
+    {
+      "type": "create_list_item",
+      "description": "Create local SharePoint-like item",
+      "requires_approval": true,
+      "side_effect": "sqlite"
+    },
+    {
+      "type": "update_list_item",
+      "description": "Update local SharePoint-like item",
+      "requires_approval": true,
+      "side_effect": "sqlite"
+    },
+    {
+      "type": "lookup_list_item",
+      "description": "Find local SharePoint-like item",
+      "requires_approval": false,
+      "side_effect": "read"
+    },
+    {
+      "type": "delay_simulated",
+      "description": "Advance virtual clock only",
+      "requires_approval": false,
+      "side_effect": "none"
+    },
+    {
+      "type": "log_event",
+      "description": "Append trace log",
+      "requires_approval": false,
+      "side_effect": "audit"
+    },
+    {
+      "type": "custom_api",
+      "description": "Query the allowlisted in-process invoice summary stub; no HTTP network access",
+      "requires_approval": false,
+      "side_effect": "read"
+    },
+    {
+      "type": "terminate",
+      "description": "Stop simulated workflow",
+      "requires_approval": false,
+      "side_effect": "none"
+    }
+  ]
+}

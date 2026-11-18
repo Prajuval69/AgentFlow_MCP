@@ -1,0 +1,606 @@
+{
+  "$defs": {
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "passage": {
+          "title": "Passage",
+          "type": "string"
+        },
+        "score": {
+          "title": "Score",
+          "type": "number"
+        },
+        "content_sha256": {
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "trusted_as_instructions": {
+          "const": false,
+          "default": false,
+          "title": "Trusted As Instructions",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_id",
+        "version",
+        "title",
+        "passage",
+        "score",
+        "content_sha256"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "Step": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "action_type": {
+          "enum": [
+            "manual_trigger",
+            "compare_number",
+            "manager_approval",
+            "send_notification",
+            "create_list_item",
+            "update_list_item",
+            "lookup_list_item",
+            "delay_simulated",
+            "terminate",
+            "log_event",
+            "custom_api"
+          ],
+          "title": "Action Type",
+          "type": "string"
+        },
+        "inputs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Inputs",
+          "type": "object"
+        },
+        "next_on_success": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next On Success"
+        },
+        "next_on_failure": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next On Failure"
+        },
+        "approval_required": {
+          "default": false,
+          "title": "Approval Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "action_type"
+      ],
+      "title": "Step",
+      "type": "object",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "manual_trigger"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {},
+                "title": "EmptyInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "compare_number"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "predicate": {
+                    "$ref": "#/$defs/Predicate"
+                  }
+                },
+                "required": [
+                  "predicate"
+                ],
+                "title": "CompareInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "manager_approval"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "reviewer": {
+                    "const": "demo-reviewer",
+                    "default": "demo-reviewer",
+                    "title": "Reviewer",
+                    "type": "string"
+                  }
+                },
+                "title": "ApprovalInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "send_notification"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel": {
+                    "const": "mock_outbox",
+                    "default": "mock_outbox",
+                    "title": "Channel",
+                    "type": "string"
+                  },
+                  "recipient": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "title": "Recipient",
+                    "type": "string"
+                  },
+                  "text": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "title": "Text",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "recipient",
+                  "text"
+                ],
+                "title": "NotificationInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "create_list_item"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "list_name": {
+                    "const": "invoices",
+                    "default": "invoices",
+                    "title": "List Name",
+                    "type": "string"
+                  },
+                  "item_id": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+                    "title": "Item Id",
+                    "type": "string"
+                  },
+                  "fields": {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "maxProperties": 20,
+                    "title": "Fields",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "item_id"
+                ],
+                "title": "ListInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "update_list_item"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "list_name": {
+                    "const": "invoices",
+                    "default": "invoices",
+                    "title": "List Name",
+                    "type": "string"
+                  },
+                  "item_id": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+                    "title": "Item Id",
+                    "type": "string"
+                  },
+                  "fields": {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "maxProperties": 20,
+                    "title": "Fields",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "item_id"
+                ],
+                "title": "ListInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "lookup_list_item"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "list_name": {
+                    "const": "invoices",
+                    "default": "invoices",
+                    "title": "List Name",
+                    "type": "string"
+                  },
+                  "item_id": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+                    "title": "Item Id",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "item_id"
+                ],
+                "title": "LookupInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "delay_simulated"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "seconds": {
+                    "maximum": 31536000,
+                    "minimum": 0,
+                    "title": "Seconds",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "seconds"
+                ],
+                "title": "DelayInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "terminate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "outcome": {
+                    "default": "completed_simulated",
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "title": "Outcome",
+                    "type": "string"
+                  }
+                },
+                "title": "TerminateInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "log_event"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "title": "Text",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "title": "LogInputs",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action_type": {
+                "const": "custom_api"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "inputs": {
+                "additionalProperties": false,
+                "properties": {
+                  "endpoint": {
+                    "const": "internal://invoice-summary",
+                    "title": "Endpoint",
+                    "type": "string"
+                  },
+                  "payload": {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "maxProperties": 20,
+                    "title": "Payload",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "endpoint"
+                ],
+                "title": "CustomInputs",
+                "type": "object"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Predicate": {
+      "additionalProperties": false,
+      "properties": {
+        "operator": {
+          "enum": [
+            "equals",
+            "greater_than",
+            "less_than",
+            "contains",
+            "and",
+            "or"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "value": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "operands": {
+          "items": {
+            "$ref": "#/$defs/Predicate"
+          },
+          "maxItems": 10,
+          "title": "Operands",
+          "type": "array"
+        }
+      },
+      "required": [
+        "operator"
+      ],
+      "title": "Predicate",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "intent": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Intent",
+      "type": "string"
+    },
+    "version": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/Step"
+      },
+      "maxItems": 100,
+      "title": "Steps",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "maxItems": 10,
+      "title": "Evidence",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "requires_manual_review": {
+      "default": false,
+      "title": "Requires Manual Review",
+      "type": "boolean"
+    },
+    "simulation_mode": {
+      "const": true,
+      "default": true,
+      "title": "Simulation Mode",
+      "type": "boolean"
+    },
+    "provider": {
+      "default": "mock",
+      "enum": [
+        "mock",
+        "ollama"
+      ],
+      "title": "Provider",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "intent",
+    "steps"
+  ],
+  "title": "Plan",
+  "type": "object"
+}
